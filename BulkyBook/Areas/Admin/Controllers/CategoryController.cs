@@ -75,7 +75,7 @@ namespace BulkyBook.Areas.Admin.Controllers
             var obFromDb = _unitOfWork.Category.Get(id);
             if (obFromDb == null)
             {
-                return Json(new {success = true, message = "Error while deleting"});
+                return Json(new {success = false, message = "Error while deleting"});
             }
             _unitOfWork.Category.Remove(obFromDb);
             _unitOfWork.Save();
