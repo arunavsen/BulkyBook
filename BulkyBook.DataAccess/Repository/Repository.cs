@@ -31,7 +31,7 @@ namespace BulkyBook.DataAccess.Repository
             return DbSet.Find(id);
         }
 
-        public IEnumerable<T> GetAll(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string IncludeProperties = null)
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string includeProperties = null)
         {
             IQueryable<T> query = DbSet;
             if (filter != null)
@@ -39,9 +39,9 @@ namespace BulkyBook.DataAccess.Repository
                 query = query.Where(filter);
             }
 
-            if (IncludeProperties != null)
+            if (includeProperties != null)
             {
-                foreach (var item in IncludeProperties.Split(new char[]{','},StringSplitOptions.RemoveEmptyEntries))
+                foreach (var item in includeProperties.Split(new char[]{','},StringSplitOptions.RemoveEmptyEntries))
                 {
                     query = query.Include(item);
                 }
