@@ -31,9 +31,34 @@ namespace BulkyBook.DataAccess.Repository
             return DbSet.Find(id);
         }
 
+        //public IEnumerable<T> GetAll(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string includeProperties = null)
+        //{
+        //    IQueryable<T> query = DbSet;
+        //    if (filter != null)
+        //    {
+        //        query = query.Where(filter);
+        //    }
+
+        //    if (includeProperties != null)
+        //    {
+        //        foreach (var item in includeProperties.Split(new char[]{','},StringSplitOptions.RemoveEmptyEntries))
+        //        {
+        //            query = query.Include(item);
+        //        }
+        //    }
+
+        //    if (orderBy != null)
+        //    {
+        //        return orderBy(query).ToList();
+        //    }
+
+        //    return query.ToList();
+        //}
+
         public IEnumerable<T> GetAll(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string includeProperties = null)
         {
             IQueryable<T> query = DbSet;
+
             if (filter != null)
             {
                 query = query.Where(filter);
@@ -41,9 +66,9 @@ namespace BulkyBook.DataAccess.Repository
 
             if (includeProperties != null)
             {
-                foreach (var item in includeProperties.Split(new char[]{','},StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    query = query.Include(item);
+                    query = query.Include(includeProp);
                 }
             }
 
@@ -51,7 +76,6 @@ namespace BulkyBook.DataAccess.Repository
             {
                 return orderBy(query).ToList();
             }
-
             return query.ToList();
         }
 
