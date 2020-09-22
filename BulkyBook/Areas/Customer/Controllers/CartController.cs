@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -15,7 +16,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
 using Stripe;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace BulkyBook.Areas.Customer.Controllers
 {
@@ -23,16 +27,18 @@ namespace BulkyBook.Areas.Customer.Controllers
     public class CartController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private TwilioSettings _twilioOptions { get; set; }
         private readonly IEmailSender _emailSender;
         private readonly UserManager<IdentityUser> _userManager;
         [BindProperty]
         public ShoppingCartVM ShoppingCartVm { get; set; }
 
-        public CartController(IUnitOfWork unitOfWork, IEmailSender emailSender, UserManager<IdentityUser> userManager)
+        public CartController(IUnitOfWork unitOfWork, IEmailSender emailSender, UserManager<IdentityUser> userManager,IOptions<TwilioSettings> twilioOptions)
         {
             _unitOfWork = unitOfWork;
             _emailSender = emailSender;
             _userManager = userManager;
+            _twilioOptions = twilioOptions.Value;
         }
 
         public IActionResult Index()
@@ -259,6 +265,20 @@ namespace BulkyBook.Areas.Customer.Controllers
 
         public IActionResult OrderConfirmation(int id)
         {
+            OrderHeader orderHeader = _unitOfWork.OrderHeader.GetFirstOrDefault(u => u.Id == id);
+            TwilioClient.Init(_twilioOptions.AccountSid,_twilioOptions.AuthToken);
+            try
+            {
+                var message = MessageResource.Create(
+                    body: "Order placed on bulky book. Your order ID:" + id,
+                    from: new Twilio.Types.PhoneNumber(_twilioOptions.PhoneNumber),
+                    to: new Twilio.Types.PhoneNumber(orderHeader.PhoneNumber)
+                );
+            }
+            catch (Exception ex)
+            {
+
+            }
             return View(id);
         }
     }
